@@ -48,6 +48,7 @@
 import errorbar from '@/components/errorbar'
 import mainAPI from '@/mixins/mainAPI'
 export default {
+    
     data(){
         return{
             UserData:{
@@ -63,11 +64,17 @@ export default {
     components:{
         errorbar
     },
+    beforeCreate () {
+      const loggedIn = this.$store.getters.loginStatus
+      if (loggedIn) {
+        this.$router.replace('/')
+      }
+    },
     
     methods: {
         onLogin () {
             if (this.$refs.form.validate()) {
-                console.log("login" + this.UserData);
+                this.$store.dispatch('loginUser',this.UserData)
             }
         },
         reset () {
@@ -75,6 +82,10 @@ export default {
         this.UserData.password = ''
 
         },
+        jobsDone(){
+           this.removeErrors()
+           this.$router.replace("/")
+      }
    
   },
    

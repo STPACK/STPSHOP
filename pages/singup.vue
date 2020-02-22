@@ -75,6 +75,7 @@ export default {
         onLogin () {
             if (this.$refs.form.validate()) {
                 this.$store.dispatch('singupUser',this.SingupData) 
+               
             }
         },
        reset(){
@@ -84,6 +85,10 @@ export default {
         this.SingupData.password = ''
 
        },
+      jobsDone(){
+           this.removeErrors()
+           this.$router.replace("/")
+      }
       
    
   },

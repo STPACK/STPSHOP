@@ -23,7 +23,8 @@
         <v-spacer></v-spacer>
 
         <v-toolbar-items>
-          <v-btn text to="/login"><v-icon>mdi-export-variant</v-icon>User</v-btn>
+          <v-btn text to="/login" :hidden="auth" ><v-icon>mdi-export-variant</v-icon>login</v-btn>
+          <v-btn text to="/user" :hidden="false" ><v-icon>mdi-export-variant</v-icon>Hi {{username}}</v-btn>
           <v-btn text><v-icon>mdi-plus-circle</v-icon>Order</v-btn>
           <v-btn text><v-icon>mdi-export-variant</v-icon>Masseage</v-btn>
           <v-btn text><v-icon>mdi-export-variant</v-icon>Cart</v-btn>
@@ -109,6 +110,8 @@
 
       <v-toolbar-items>
          <v-btn text>TEL 0XX-XXXXXX</v-btn>
+         <v-btn text>{{userProfile}}</v-btn>
+         <v-btn text>{{username}}</v-btn>
        
       </v-toolbar-items>
      
@@ -145,7 +148,8 @@ export default {
   data () {
     return {
       
-     
+     username:'',
+     auth:false,
       items: [
           {
             title: 'all',
@@ -168,21 +172,33 @@ export default {
               { title: 'Japanese' },
             ],
           },
-          
-          
         ],
       
   }
-},
-methods:{
-        Goto(goto){
-            this.$router.push('/category/'+goto)
-            console.log("/cat/"+goto)
-
-            
-        },
+    },
+    methods:{
+      Goto(goto){
+          this.$router.push('/category/'+goto)
+      },
         
+    },
+    computed:{
+      userProfile () {
+      return this.$store.getters.user
+        }
+      },
+
+    watch: {
+    userProfile (value) {
+      
+      if (value) {
+        this.username = value.name
+
+      } else {
+        this.username = 'Guest'
+      }
     }
+  }
 
 }
 </script>

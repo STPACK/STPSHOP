@@ -19,6 +19,11 @@ export default {
             }          
         }
     },
+    methods: {
+        removeErrors () {
+          this.$store.commit('clearError')
+        }
+      },
     computed:{
         error () {
             return this.$store.getters.error
@@ -34,6 +39,7 @@ export default {
         JobDone(value){
           if (value){
              this.$store.commit('setJobDone',false)
+             this.jobsDone()
            
           }
         }

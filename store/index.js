@@ -46,7 +46,7 @@ export const actions ={
                 id: newUser.uid,
                 email: payload.email,
                 name: payload.name,
-                role: 'consumer'
+                role: 'customer'
               }
                 console.log('USER', currentUser)
                 commit('setUser', currentUser)
@@ -90,13 +90,15 @@ export const actions ={
        
        
         fireApp.auth().signInWithEmailAndPassword(payload.email, payload.password)
-          .then(user => {
-            const authUser = {
-              id: user.uid,
-              email: user.email,
-              name: user.displayName
+          .then(User => {
+            const DataUser = fireApp.auth().currentUser;
+             const authUser = {
+              id: DataUser.uid,
+              email: DataUser.email,
+              name: DataUser.displayName
             }
-            return fireApp.database().ref('groups').orderByChild('name').equalTo('Administrator').once('value')
+            console.log(authUser)
+            return fireApp.database().ref('group').orderByChild('name').equalTo('admin').once('value')
               .then(snapShot => {
                 const groupKey = Object.keys(snapShot.val())[0]
                 return fireApp.database().ref(`userGroups/${groupKey}`).child(`${authUser.id}`).once('value')
@@ -106,7 +108,9 @@ export const actions ={
                     } else {
                       authUser.role = 'customer'
                     }
+                    console.log(authUser)
                     commit('setUser', authUser)
+                    
                     commit('setBusy', false)
                     commit('setJobDone', true)
                   })
@@ -129,9 +133,9 @@ export const getters ={
     user (state) {
         return state.user
     },
-    loginStatus(state){
-        return state.userStatus
-    },
+    loginStatus (state) {
+        return state.user !== null && state.user !== undefined
+      },
     busy(state){
         return state.busy
     },
