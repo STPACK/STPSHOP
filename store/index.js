@@ -122,6 +122,70 @@ export const actions ={
           })
       },
 
+      logOut ({commit}) {
+        fireApp.auth().signOut()
+        commit('setUser', null)
+      },
+
+      setAuthStatus ({commit}) {
+        fireApp.auth().onAuthStateChanged((user) => {
+          if (user) {
+            const authUser = {
+              id: user.uid,
+              email: user.email,
+              name: user.displayName
+            }
+            fireApp.database().ref('group').orderByChild('name').equalTo('admin').once('value')
+              .then(snapShot => {
+                const groupKey = Object.keys(snapShot.val())[0]
+                fireApp.database().ref(`userGroups/${groupKey}`).child(`${authUser.id}`).once('value')
+                  .then(uGroupSnap => {
+                    if (uGroupSnap.exists()) {
+                      authUser.role = 'admin'
+                    } else {
+                      authUser.role = 'customer'
+                    }
+                    commit('setUser', authUser)
+                  })
+              })
+          }
+        })
+      },
+
+      updateProfile ({commit, getters}, payload) {
+      
+        commit('setBusy', true)
+        commit('clearError')
+        const userData = getters.user
+        const user = fireApp.auth().currentUser
+        const updateDb = () => {
+          const updateObj = {}
+          if (userData.role == 'admin') {
+            updateObj[`userGroups/-M0f_4DRN85I9V77oxEi/${user.uid}`] = payload
+          }
+          updateObj[`userGroups/-M0f_Aakx52BbOgkXzuI/${user.uid}`] = payload
+          updateObj[`users/${user.uid}/name`] = payload
+          return fireApp.database().ref().update(updateObj)
+        }
+        user.updateProfile({displayName: payload})
+          .then(updateDb)
+          .then(() => {        
+            const userObj = {
+              id: userData.id,
+              email: userData.email,
+              name: payload,
+              role: userData.role
+            }
+            commit('setUser', userObj)
+            commit('setBusy', false)
+            commit('setJobDone', true)
+          })
+          .catch(error => {
+            commit('setBusy', false)
+            commit('setError', error)
+          })        
+      },
+
     
       
 
@@ -136,6 +200,10 @@ export const getters ={
     loginStatus (state) {
         return state.user !== null && state.user !== undefined
       },
+    userRole(state){
+      const isLoggedIn = state.user !== null && state.user !== undefined
+      return (isLoggedIn) ? state.user.role : 'customer'
+    },
     busy(state){
         return state.busy
     },

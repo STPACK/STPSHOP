@@ -23,10 +23,42 @@
         <v-spacer></v-spacer>
 
         <v-toolbar-items>
-          <v-btn text to="/login" :hidden="auth" ><v-icon>mdi-export-variant</v-icon>login</v-btn>
-          <v-btn text to="/user" :hidden="!auth" ><v-icon>mdi-export-variant</v-icon>Hi {{username}}</v-btn>
-          <v-btn text><v-icon>mdi-plus-circle</v-icon>Order</v-btn>
-          <v-btn text><v-icon>mdi-export-variant</v-icon>Masseage</v-btn>
+        
+          
+              <v-menu offset-y>
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                  text
+                  :disabled="!userLoggedIn"
+                  v-on="on"
+                  >
+                    Hi {{username}}
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item
+                    v-for="(item, index) in userMenu"
+                    :key="index"
+                    :to= item.link
+                  >
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item to="/admin" v-if="userIsAdmin">
+                    <v-list-item-title >Product</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item to="/admin" v-if ="userIsAdmin">
+                    <v-list-item-title >Order</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="Logout">
+                    <v-list-item-title >Logout</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+              <v-btn text to="/login" :hidden="userLoggedIn" ><v-icon>mdi-export-variant</v-icon>Login</v-btn>  
+              <v-btn text @click="Logout"  :hidden="!userLoggedIn" ><v-icon>mdi-export-variant</v-icon>Logout</v-btn>  
+      
+        
+          
           <v-btn text><v-icon>mdi-export-variant</v-icon>Cart</v-btn>
         
         </v-toolbar-items >
@@ -110,12 +142,13 @@
 
       <v-toolbar-items>
          <v-btn text>TEL 0XX-XXXXXX</v-btn>
+         <v-btn text>{{this.$store.getters.user}}</v-btn>
        
       </v-toolbar-items>
      
 
       
-    </v-toolbar>
+    </v-toolbar><br>
   </div>
     <v-content>
       <div class="contrainer">
@@ -146,8 +179,18 @@ export default {
   data () {
     return {
       
-     username:'',
-     auth:false,
+     username:'Guest',
+    
+     userMenu: [
+          {
+            title: 'Profile',
+            link:'/user/profile'
+          },
+          {
+            title: 'Change Password',
+            link:'/user/change-password'
+          },
+       ],
       items: [
           {
             title: 'all',
@@ -178,23 +221,43 @@ export default {
       Goto(goto){
           this.$router.push('/category/'+goto)
       },
+      Logout(){
+          this.$store.dispatch('logOut')
+          this.$router.push('/')
+      }
         
     },
+    created () {
+    if (!this.userLoggedIn) {
+      this.$store.dispatch('setAuthStatus')
+    }    
+    },
+    
     computed:{
       userProfile () {
       return this.$store.getters.user
-        }
       },
+      userLoggedIn () {
+      return this.$store.getters.loginStatus
+      },
+      userIsAdmin () {
+      return this.$store.getters.userRole === 'admin'
+        }
+        
+      },
+      
+    
 
     watch: {
     userProfile (value) {
       
       if (value) {
         this.username = value.name
-        this.auth = true
+     
 
       } else {
         this.username = 'Guest'
+       
       }
     }
   }

@@ -12,16 +12,15 @@ const firebaseConfig = {
   }
   
   
-  let fireApp
+  let fireApp, adminApp 
 
   if (!fireApp && !firebase.apps.length) {
     fireApp = firebase.initializeApp(firebaseConfig)
-   
+    adminApp = firebase.initializeApp(firebaseConfig, 'fireAdmin')
   } else {
     fireApp = firebase.app()
-    
+    adminApp = firebase.app('fireAdmin')
   }
   
-  export  {fireApp}
-
+  export { fireApp, adminApp }
 
