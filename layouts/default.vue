@@ -44,6 +44,9 @@
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                   </v-list-item>
                   <v-list-item to="/admin" v-if="userIsAdmin">
+                    <v-list-item-title >admin</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item to="/admin/product" v-if="userIsAdmin">
                     <v-list-item-title >Product</v-list-item-title>
                   </v-list-item>
                   <v-list-item to="/admin" v-if ="userIsAdmin">

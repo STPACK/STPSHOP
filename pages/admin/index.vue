@@ -6,6 +6,9 @@
               <v-btn to="/portal/product"  color="light-green">
                     new poductList
                 </v-btn>
+              <v-btn to="/admin/product"  color="light-green">
+                    poductList
+                </v-btn>
                 <v-btn to="/admin/user-group"  color="light-green">
                     User Group
                 </v-btn>
