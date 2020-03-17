@@ -49,7 +49,7 @@
                   <v-list-item to="/admin/product" v-if="userIsAdmin">
                     <v-list-item-title >Product</v-list-item-title>
                   </v-list-item>
-                  <v-list-item to="/admin" v-if ="userIsAdmin">
+                  <v-list-item to="/admin/order" v-if ="userIsAdmin">
                     <v-list-item-title >Order</v-list-item-title>
                   </v-list-item>
                   <v-list-item @click="Logout">

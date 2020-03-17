@@ -33,7 +33,7 @@
                     <v-text-field
                         v-model="editedItem.name"
                         counter
-                        maxlength="50"
+                        maxlength="70"
                         hint="ตั้งชื่อให้สอดคล้องกับประเภทของสินค้า"
                         label="ชื่อสินค้า"
                         required
@@ -118,6 +118,14 @@
       </v-toolbar>
     </template>
     <template v-slot:item.action="{ item }">
+      
+      <v-icon
+        small
+        class="mr-2"
+        @click="view(item.key)"
+      >
+        mdi-eye
+      </v-icon>
       <v-icon
         small
         class="mr-2"
@@ -131,18 +139,18 @@
       >
         mdi-delete
       </v-icon>
+     
     </template>
-    <template v-slot:no-data>
-      <v-btn color="primary" @click="initialize">Reset</v-btn>
-    </template>
+    
   </v-data-table>
-    <h1>{{test}}</h1>
+    
   </div>
 </template>
 
 <script>
   export default {
-    data: () => ({
+    data () {
+      return{
       dialog: false,
       headers: [
         {
@@ -157,7 +165,6 @@
         { text: 'price ', value: 'price' },
         { text: 'Actions', value: 'action', sortable: false },
       ],
-      desserts:[],
       editedIndex: -1,
       editedItem: {
         name: '',
@@ -178,22 +185,26 @@
         price: 0,
       },
       foodCategory: [
-            'seafood',
-            'beaf'
+            'Seafood',
+            'Beaf'
         ],
         foodGenus:[
             ''
         ],
-    }),
+    }},
 
     computed: {
       formTitle () {
         return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
       },
       
-       test () {
+      test () {
+        return this.$store.getters['product/products']
+      },
+      desserts(){
         return this.$store.getters['product/products']
       }
+     
     },
     
 
@@ -209,10 +220,12 @@
         this.$store.dispatch('product/getProducts')
       }
     },
-
+    
     methods: {
+
       initialize () {
-        this.desserts = []
+        
+        this.desserts = this.$store.getters['product/products']
          
       },
 
@@ -223,38 +236,37 @@
       },
 
       deleteItem (item) {
-        const index = this.desserts.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
+       
+        confirm('Are you sure you want to delete this item?') &&
+        this.$store.dispatch('product/removeProduct', item)
+
       },
 
       close () {
         this.dialog = false
         this.foodGenus = ['']
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        }, 300)
-        
-
+      },
+      view(key){
+          this.$router.push('/admin/'+key)
       },
 
       save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
+         this.$store.dispatch('product/updateProduct', this.editedItem)
         } else {
-          this.desserts.push(this.editedItem)
+          
           this.$store.dispatch('product/addProduct', this.editedItem)
         }
         this.close()
       },
-       checkCategory1(item){
-            this.editedItem.genus = '';
-            if (item === 'seafood'){
-                this.foodGenus=['salmon','lobster','uni']
-            }else{
-                this.foodGenus=['australia','newZealand','unitedStates','japan']
-            }
-        },
+      checkCategory1(item){
+          this.editedItem.genus = '';
+          if (item === 'Seafood'){
+              this.foodGenus=['Salmon','Lobster','Fish Roe']
+          }else{
+              this.foodGenus=['Australia','NewZealand','UnitedStates','Japan']
+          }
+      },
     },
 
   }
