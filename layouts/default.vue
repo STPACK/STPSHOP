@@ -57,12 +57,19 @@
                   </v-list-item>
                 </v-list>
               </v-menu>
-              <v-btn text to="/login" :hidden="userLoggedIn" ><v-icon>mdi-export-variant</v-icon>Login</v-btn>  
-              <v-btn text @click="Logout"  :hidden="!userLoggedIn" ><v-icon>mdi-export-variant</v-icon>Logout</v-btn>  
-      
-        
-          
-          <v-btn text><v-icon>mdi-export-variant</v-icon>Cart</v-btn>
+              <v-btn text to="/login" :hidden="userLoggedIn" >Login<v-icon >mdi-account-outline</v-icon></v-btn>  
+              <v-btn text @click="Logout"  :hidden="!userLoggedIn" >Logout<v-icon>mdi-export-variant</v-icon></v-btn>  
+              <v-btn text to="/cart">
+                 <v-badge
+                    :content="cart.items.length"
+                    :value=" cart.items.length > 0 ? true : false "
+                    color="green"
+                  >
+                    Cart
+                    <v-icon>mdi-cart-outline</v-icon>
+                    
+                </v-badge>
+                </v-btn>
         
         </v-toolbar-items >
       </v-app-bar>
@@ -144,7 +151,7 @@
       <v-spacer></v-spacer>
 
       <v-toolbar-items>
-         <v-btn text>TEL 0XX-XXXXXX</v-btn>
+        
          <v-btn text>{{this.$store.getters.user}}</v-btn>
        
       </v-toolbar-items>
@@ -172,13 +179,12 @@
 
 <script>
 import menubar from '@/components/menufile/menutab'
+import cart from '@/mixins/cart' 
 export default {
   components:{
     menubar,
   },
-
-
-
+  mixins: [cart],
   data () {
     return {
       
@@ -245,8 +251,8 @@ export default {
       },
       userIsAdmin () {
       return this.$store.getters.userRole === 'admin'
-        }
-        
+      },
+  
       },
       
     
@@ -256,7 +262,6 @@ export default {
       
       if (value) {
         this.username = value.name
-     
 
       } else {
         this.username = 'Guest'

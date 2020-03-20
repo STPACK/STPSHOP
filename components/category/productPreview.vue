@@ -1,64 +1,100 @@
 <template>
     
     <v-flex>
-        <v-card  hover  >
-            <v-card :href="postLink"  >
+        <v-card hover flat
+                width="300" height="400" 
+        >
+            <v-card @click="postLink()"  flat >
                 <v-img
-                :src="imageUrl"
-                aspect-ratio="1"
+                    :src="imageUrl"
+                    contain
+                    height="250px"
                 />
-            </v-card>
-            <v-card-title>
-                {{productName}}
+            </v-card>   
+            <v-card flat  height="85px">
+            <v-card-title >
+                {{name}}
             </v-card-title>
-
-            <v-card-subtitle>
-                Bath=> {{price}}
-                <v-icon right>
-                    mdi-shopping-outline
-                </v-icon>
-            </v-card-subtitle>
             
+            </v-card>
+            <v-card-actions>
+               
+                     Bath=> {{price}}
+               
+              
+                 <v-spacer></v-spacer>
+                 <v-btn class="ma-2" tile color="green" dark  @click="addToCart(product)">
+                        
+                        <v-icon>mdi-cart-outline</v-icon>ADD
+                        
+                        </v-btn>
+                
+            </v-card-actions>
+            <v-divider></v-divider>
+
         </v-card>             
     </v-flex>
      
 </template>
 
 <script>
+import cart from '@/mixins/cart'
+
 export default {
-    name:'productPreview',
+    data(){
+        return{
+            product:{
+                name:this.name,
+                idKey:this.idKey,
+                imageUrl:this.imageUrl,
+                price:this.price,
+                id:this.id
+
+            }
+        }
+    },
+    mixins: [cart],
     props:{
         id:{
             type: String,
             required:true
         },
 
-        isAdmin:{
-            type: Boolean,
-            default: false
-        },
         imageUrl:{
             type:String,
             required:true
         },
-        productName:{
+        name:{
             type:String,
             required:true
         },
         price:{
-            type:Number,
+            type:String,
+            required:true
+        },
+        idKey:{
+            type:String,
             required:true
         },
         
     },
-    computed:{
+    methods:{
         postLink(){
-            return this.isAdmin ? '/admin/'+this.id : '/product/'+this.id
+            this.$router.push('/product/'+this.idKey)
         }
     },
+
+    
+    
     
    
     
 }
 </script>
 
+<style scoped>
+*{
+    font-family: 'Sarabun', sans-serif;
+    font-size: 15px;
+}
+</style>

@@ -9,11 +9,14 @@ export default {
                     ],
                 emailRules: [
                     v => !!v || 'E-mail is required',
-                    v => /.+@.+/.test(v) || 'E-mail must be valid',
+                    v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
                 ],
                 passwordRules:[
                     v => !!v || 'password is required',
-                    v => v.length >= 6 || 'password must be more than 10 characters',
+                    v => v.length >= 6 || 'password must be more than 6 characters',
+                ],
+                required:[
+                  v => !!v || 'required !!',
                 ]
 
             }          

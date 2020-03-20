@@ -1,15 +1,20 @@
 <template>
     <v-flex d-flex row>
+        
+
+        
         <productPreview
         v-for="product in products"
-        :key="product.id"
-        :is-admin="isAdmin"
+        :key="product.productID"
         :imageUrl="product.imageUrl"
-        :id="product.id"
-        :productName="product.productName"
+        :id="product.productID"
+        :name="product.name"
         :price="product.price"
-        md3
+        :idKey="product.key"
+        
         />
+
+        
         
         
     </v-flex>
@@ -24,10 +29,7 @@ export default {
         productPreview
     },
     props:{
-        isAdmin:{
-            type:Boolean,
-            default:false
-        },
+       
         products:{
             type:Array,
             required: true

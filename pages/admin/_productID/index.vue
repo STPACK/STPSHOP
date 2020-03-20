@@ -111,7 +111,14 @@ export default {
         return { product }
       })
   },
-  
+  head () {
+    return {
+      title: this.product.name,
+      meta: [
+        { hid: 'description', name: 'description', content: this.product.name }
+      ]
+    }
+  }
     
 }
 </script>

@@ -8,6 +8,9 @@
     sort-by="calories"
     class="elevation-1"
   >
+  <template v-slot:item.volume="{ item }">
+      <v-chip :color="getColor(item.volume)" dark>{{ item.volume }}</v-chip>
+    </template>
     <template v-slot:top>
       <v-toolbar flat color="white">
         <v-toolbar-title>My Product</v-toolbar-title>
@@ -17,10 +20,16 @@
           vertical
         ></v-divider>
         <v-spacer></v-spacer>
+
         <v-dialog v-model="dialog" max-width="700px">
           <template v-slot:activator="{ on }">
             <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
           </template>
+          <v-form
+            ref="form"
+            v-model="valid"
+            
+          >
           <v-card>
             <v-card-title>
               <span class="headline">{{ formTitle }}</span>
@@ -36,7 +45,7 @@
                         maxlength="70"
                         hint="ตั้งชื่อให้สอดคล้องกับประเภทของสินค้า"
                         label="ชื่อสินค้า"
-                        required
+                        :rules="rules.required"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
@@ -46,7 +55,7 @@
                         chips
                         label="ชนิดของสินค้า"
                         v-on:change="checkCategory1(editedItem.types)"
-                        required
+                        :rules="rules.required"
                         
                     ></v-combobox>
                   </v-col>
@@ -56,23 +65,32 @@
                         :items="foodGenus"
                         chips
                         label="ชนิดของสินค้า"
-                        required
+                        :rules="rules.required"
                     ></v-combobox>
                   </v-col>
-                   <v-col cols="12" sm="6" md="6">
+                   <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                        v-model="editedItem.productID"
+                        type="number"
+                        label="รหัสสินค้า"
+                        :rules="rules.required"
+                    ></v-text-field>
+                  </v-col>
+                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
                         v-model="editedItem.price"
                         type="number"
                         label="ราคา"
-                        required
+                        :rules="rules.required"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="12" sm="6" md="6">
+                 
+                  <v-col cols="12" sm="6" md="4">
                     <v-text-field
                         v-model="editedItem.volume"
                         type="number"
                         label="จำนวน"
-                        required
+                        :rules="rules.required"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="12" md="12">
@@ -83,6 +101,7 @@
                         counter
                         maxlength="5000"
                         auto-grow
+                        :rules="rules.required"
                     ></v-textarea>
                   </v-col>
                   <v-col cols="12" sm="12" md="12">
@@ -94,13 +113,14 @@
                         counter
                         maxlength="2000"
                         auto-grow
+                        :rules="rules.required"
                     ></v-textarea>
                   </v-col>
                   <v-col cols="12" sm="12" md="12">
                    <v-text-field
                         v-model="editedItem.imageUrl"
                         label="URL ภาพสินค้า "
-                        required
+                        :rules="rules.required"
                     ></v-text-field>
                   </v-col>
                  
@@ -110,10 +130,12 @@
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+              <v-btn color="success darken-1" :disabled="!valid"  @click="save">Save</v-btn>
+              <v-btn color="warning darken-1"  @click="resetForm">reset</v-btn>
+              <v-btn color="error darken-1"  @click="close">Cancel</v-btn>
             </v-card-actions>
           </v-card>
+           </v-form>
         </v-dialog>
       </v-toolbar>
     </template>
@@ -148,9 +170,12 @@
 </template>
 
 <script>
+import mainAPI from '@/mixins/mainAPI'
   export default {
+     mixins:[mainAPI],
     data () {
       return{
+      valid: true,
       dialog: false,
       headers: [
         {
@@ -159,38 +184,32 @@
           sortable: false,
           value: 'name',
         },
-        { text: 'types', value: 'types' },
-        { text: 'genus', value: 'genus' },
-        { text: 'volume', value: 'volume' },
-        { text: 'price ', value: 'price' },
+        { text: 'ID', value: 'productID' },
+        { text: 'Types', value: 'types' },
+        { text: 'Genus', value: 'genus' },
+        { text: 'Price ', value: 'price' },
+        { text: 'Volume', value: 'volume' },
         { text: 'Actions', value: 'action', sortable: false },
       ],
       editedIndex: -1,
       editedItem: {
         name: '',
+        productID: null,
         types: '',
         genus: '',
         detailPD:'',
         imageUrl:'',
-        volume: 0,
-        price: 0,
+        volume: null,
+        price: null,
       },
-      defaultItem: {
-        name: '',
-        types: '',
-        genus: '',
-        detailPD:'',
-        imageUrl:'',
-        volume: 0,
-        price: 0,
-      },
+      
       foodCategory: [
             'Seafood',
             'Beaf'
-        ],
-        foodGenus:[
-            ''
-        ],
+      ],
+      foodGenus:[
+          ''
+      ],
     }},
 
     computed: {
@@ -223,12 +242,6 @@
     
     methods: {
 
-      initialize () {
-        
-        this.desserts = this.$store.getters['product/products']
-         
-      },
-
       editItem (item) {
         this.editedIndex = this.desserts.indexOf(item)
         this.editedItem = Object.assign({}, item)
@@ -259,6 +272,10 @@
         }
         this.close()
       },
+      resetForm () {
+        this.$refs.form.reset()
+        
+      },
       checkCategory1(item){
           this.editedItem.genus = '';
           if (item === 'Seafood'){
@@ -267,6 +284,14 @@
               this.foodGenus=['Australia','NewZealand','UnitedStates','Japan']
           }
       },
+      getColor (volume) {
+        if (volume < 30) return 'red'
+        else if (volume < 50) return 'orange'
+        else return 'green'
+      },
+      jobsDone(){
+
+      }
     },
 
   }

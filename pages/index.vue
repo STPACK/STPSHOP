@@ -2,6 +2,7 @@
 <div>
   <div class="contrainer"> 
     <v-container fluid grid-list-md>
+          <panel/>
       <v-layout row wrap>
         <v-flex d-flex xs12  md8>
           <v-carousel
@@ -90,14 +91,14 @@
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
+
+import panel from '@/components/panel-brand'
 
 export default {
-  // layout:'mainpage',
+  
   components: {
-    Logo,
-    VuetifyLogo
+    panel
+    
   },
    data () {
       return {

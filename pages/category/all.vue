@@ -1,53 +1,16 @@
 <template>
   <div>
-    
-    <h2 class="mt-8">Hot Deal</h2>
+    <panel/>
 
-    <v-card>
-      <hotdeal/>
-    </v-card>
-   
+    
+    <h2 class="mt-8">สินค้าทั้งหมด</h2>
     <br><br>
 
     <v-container fluid grid-list-md class="pa-0">
       <v-layout row wrap>
-        <v-flex d-flex   md2   >
-          <v-card
-            color="#f5f5f5"
-            width="100%"
-          >
-            <v-card-title>
-              <v-icon
-                large
-                left
-              >
-                mdi-currency-eth
-              </v-icon>
-              <span class="title font-weight-light">Category</span>
-            </v-card-title> 
-          <v-divider></v-divider>
+      
 
-          </v-card>
-          
-        </v-flex >
-
-        <v-flex d-flex xs12  md10>
-          <v-layout row wrap>
-              <v-flex
-                d-flex
-                md12
-              >
-                <v-card
-                  color="#f5f5f5"
-                  
-                  width="100%"
-                
-                 
-                >
-                  <v-card-title>All</v-card-title>
-                </v-card>
-              </v-flex>
-
+              
               <v-flex
                 d-flex
                 md12
@@ -59,8 +22,6 @@
               </v-flex>
               
 
-        </v-layout>
-      </v-flex>
 
     </v-layout >
         </v-container>
@@ -73,21 +34,29 @@
 </template>
 
 <script>
-import BreadCrumbs from '@/components/menufile/breadCrumbs'
+
 import hotdeal from '@/components/category/hotdeal'
 import productList from '@/components/category/productList'
+import panel from '@/components/panel-brand'
 
 
 export default {
   
     components:{
-        BreadCrumbs,hotdeal,productList
+        hotdeal,productList,panel
     },
-    
+
+    created () {
+      const loadedProducts = this.$store.getters['product/products']
+      if (loadedProducts.length === 0) {
+        this.$store.dispatch('product/getProducts')
+      }
+    },
     computed: {
     loadedPosts() {
-      
-    }
+      return this.$store.getters['product/products']
+    },
+    
   }
     
     
@@ -102,6 +71,9 @@ export default {
   margin: 0;
   padding: 0;
 
+}
+h2{
+  font-family: 'Sarabun', sans-serif;
 }
 
 </style>
