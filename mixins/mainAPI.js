@@ -5,7 +5,11 @@ export default {
             rules: {
                 nameRules: [
                     v => !!v || 'Name is required',
-                    v => v.length <= 10 || 'Name must be less than 10 characters',
+                    v => v.length <= 15 || 'Name must be less than 10 characters',
+                    ],
+                lastNRules: [
+                    v => !!v || 'Name is required',
+                    v => v.length <= 20 || 'Name must be less than 10 characters',
                     ],
                 emailRules: [
                     v => !!v || 'E-mail is required',
@@ -14,6 +18,10 @@ export default {
                 passwordRules:[
                     v => !!v || 'password is required',
                     v => v.length >= 6 || 'password must be more than 6 characters',
+                ],
+                phoneRules:[
+                    v => !!v || 'phone is required',
+                    v => v.length >= 10 || 'password must be more than 6 characters',
                 ],
                 required:[
                   v => !!v || 'required !!',

@@ -27,9 +27,7 @@ export const mutations={
         state.JobDone = payload
     }
     ,
-    setUser (state, payload) {
-        state.user = payload
-      },
+    
 }
 
 export const actions ={

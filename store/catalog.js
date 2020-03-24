@@ -4,7 +4,9 @@ export const state = () => ({
   products: [],
   categories: [],
   cart: {
-    items: []
+    items: [],
+    total:[],
+    address:[]
   }
 })
 
@@ -12,17 +14,24 @@ export const mutations = {
   loadProducts (state, payload) {
     state.products = payload
   },
-  loadCategories (state, payload) {
-    state.categories = payload
-  },
+  
   updateCart (state, payload) {
     state.cart.items.push(payload)
   },
+  updateTotal (state, payload) {
+    state.cart.total = payload
+  },
+  updateAddress (state, payload) {
+    state.cart.address = payload
+  },
+
   reloadCart (state, payload) {
     state.cart.items = payload.items
   },
   emptyCart (state) {
     state.cart.items = []
+    state.cart.total=[]
+    state.cart.address=[]
   },
   updateQuantity (state, payload) {
     state.cart.items[payload.index].quantity = payload.productQuantity
@@ -35,7 +44,11 @@ export const mutations = {
     if (state.cart.items[payload].quantity === 0) {
       state.cart.items.splice(payload, 1)
     }
-  }
+  },
+  removeFromCart (state, payload) {
+    state.cart.items.splice(payload,1)
+  },
+
 }
 
 export const actions = {
@@ -93,28 +106,42 @@ export const actions = {
         console.log(error)
       })
   },
-  postOrder ({commit}, payload) {
+  postOrder ({dispatch, commit}, payload) {
     // orders/orderKey/userKey/productKey/productDetail
     const orderKey = fireApp.database().ref('orders').push().key
     const items = payload.items
+    const address = payload.address
+    const total = payload.total
     const user = fireApp.auth().currentUser
     let orderItems = {}
-
+    console.log(payload)
     items.forEach(item => {
-      orderItems[`orders/${orderKey}/${user.uid}/${item.product.key}`] = {
-        code: item.product.code,
+      orderItems[`orders/${orderKey}/${user.uid}/${item.product.idKey}`] = {
+        productID: item.product.productID,
         product: item.product.name,
         price: item.product.price,
         quantity: item.quantity,
         imageUrl: item.product.imageUrl,
         createdAt: new Date().toISOString()
       }
+      fireApp.database().ref().update(orderItems)
     })
-
-    fireApp.database().ref().update(orderItems)
+    let order = {}
+        order[orderKey] = {
+                            date:new Date().toISOString(),
+                            status:"wait",
+                            address:address,
+                            total:total
+                          }
+    fireApp.database().ref(`userOrders/${user.uid}`).update(order)
+    
+      
+   
       .then(() => {
         commit('emptyCart')
         commit('setJobDone', true, { root: true })
+        dispatch('order/getOrder',null,{ root: true })
+        
       })
       .catch(error => {
         commit('setError', error, { root: true })
@@ -125,9 +152,6 @@ export const actions = {
 export const getters = {
   products (state) {
     return state.products
-  },
-  categories (state) {
-    return state.categories
   },
   cart (state) {
     return state.cart

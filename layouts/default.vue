@@ -36,13 +36,14 @@
                   </v-btn>
                 </template>
                 <v-list>
-                  <v-list-item
-                    v-for="(item, index) in userMenu"
-                    :key="index"
-                    :to= item.link
-                  >
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                 
+                  <v-list-item to="/user/profile" >
+                    <v-list-item-title >Profile</v-list-item-title>
                   </v-list-item>
+                  <v-list-item to="/order" >
+                    <v-list-item-title >Order</v-list-item-title>
+                  </v-list-item>
+                
                   <v-list-item to="/admin" v-if="userIsAdmin">
                     <v-list-item-title >admin</v-list-item-title>
                   </v-list-item>
@@ -190,16 +191,6 @@ export default {
       
      username:'Guest',
     
-     userMenu: [
-          {
-            title: 'Profile',
-            link:'/user/profile'
-          },
-          {
-            title: 'Change Password',
-            link:'/user/change-password'
-          },
-       ],
       items: [
           {
             title: 'all',
@@ -233,6 +224,8 @@ export default {
       Logout(){
           this.$store.dispatch('logOut')
           this.$router.push('/')
+          this.$store.commit('catalog/emptyCart')
+     
       }
         
     },

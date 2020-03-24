@@ -48,14 +48,14 @@ export default {
                 idKey:this.idKey,
                 imageUrl:this.imageUrl,
                 price:this.price,
-                id:this.id
+                productID:this.productID
 
             }
         }
     },
     mixins: [cart],
     props:{
-        id:{
+        productID:{
             type: String,
             required:true
         },

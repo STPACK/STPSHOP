@@ -5,10 +5,31 @@
       
       <v-col cols="8">
          
+          <v-card
+              class="mx-auto"
+              width="400px"
+              height="150px"
+              :hidden="checkCart"
+            >
+            <v-row  justify="center" >
 
+              <v-card-title  >
+                No item in the cart
+              </v-card-title>
+            </v-row>
+            <v-row justify="center">
+
+               <v-card-actions>
+                  <v-btn to="/category/all">Back to Shopping</v-btn>
+              </v-card-actions>
+            </v-row>
+
+            </v-card>
           <v-row 
             v-for="(item,index) in cart.items" :key="index" 
         >
+
+            
             <v-card
             class=" mb-2 d-inline-block"
             outlined
@@ -36,8 +57,8 @@
                                 </v-col>
 
                                 <v-col >
-                                <v-btn icon>
-                                    <v-icon>mdi-bookmark</v-icon>
+                                <v-btn icon @click="removeFromCart(index)">
+                                    <v-icon color="red"> mdi-delete</v-icon>
                                 </v-btn>
                                 
                                 </v-col>
@@ -46,11 +67,11 @@
                             </v-row>
                         </v-col>
                         <v-col>
-                             <v-btn class="mx-1" fab  dark  x-small color="green">
+                             <v-btn class="mx-1" fab  dark  x-small color="green" @click="decreaseQuantity(index)">
                         <v-icon dark x-small>mdi-minus</v-icon>
                     </v-btn>
                     {{ item.quantity }}
-                    <v-btn class="mx-1"  fab  dark  x-small color="green">
+                    <v-btn class="mx-1"  fab  dark  x-small color="green" @click="increaseQuantity(index)">
                         <v-icon dark x-small>mdi-plus</v-icon>
                     </v-btn>
                         </v-col>
@@ -80,19 +101,54 @@
         </v-list-item>
         <v-list-item>
             <v-list-item-title>ยอดรวม</v-list-item-title>
-            <v-list-item-title class="text-right"> <strong>  {{cartTotal.amount}}฿ </strong></v-list-item-title>
+            <v-list-item-title class="text-right" > <strong>  {{cartTotal.amount}}฿ </strong></v-list-item-title>
         </v-list-item>
+       
+        
+        <v-divider></v-divider>
+
+        <v-card-actions>
+            <v-btn  width="100%" color="warning" @click="checkout">Checkout</v-btn>
+        </v-card-actions>
 
         </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
+
 <script>
 
 import cart from '@/mixins/cart'
 export default {
+  
     mixins: [cart],
+    data(){
+      return{
+        carLength:false
+      }
+    },
+    methods: {
+      checkout (carTotal) {
+        const isLoggedIn = this.$store.getters.loginStatus
+        if (!isLoggedIn) {
+          
+          this.$router.push('/login')
+        } else {
+          this.$router.push('/checkout')
+        }
+      },
+    },
+    computed: {
+      checkCart(){
+        const cartItems = this.cart.items
+          if (cartItems.length === 0) {
+            return false
+        }else{
+          return true
+        }
+      }
+    }
     
     
     

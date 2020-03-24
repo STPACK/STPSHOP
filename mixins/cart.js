@@ -1,7 +1,9 @@
 export default {
     data () {
       return {
-        cart: this.$store.getters['catalog/cart']
+        cart: this.$store.getters['catalog/cart'],
+       
+      
       }
     },
     methods: {
@@ -34,18 +36,21 @@ export default {
           }
         }
       },
+      removeFromCart(i){
+        confirm('Are you sure you want to delete this item?') &&
+        this.$store.commit('catalog/removeFromCart', i)
+      },
 
       increaseQuantity (i) {
         this.$store.commit('catalog/increaseQuantity', i)
-        this.updateLocalStorage()
+        
       },
       decreaseQuantity (i) {
         this.$store.commit('catalog/decreaseQuantity', i)
-        this.updateLocalStorage()
+        
       },
-      updateLocalStorage () {
-        this.$warehouse.set('cart', this.cart)
-      }
+     
+     
     },
     computed: {
       cartTotal () {

@@ -7,7 +7,7 @@
         v-for="product in products"
         :key="product.productID"
         :imageUrl="product.imageUrl"
-        :id="product.productID"
+        :productID="product.productID"
         :name="product.name"
         :price="product.price"
         :idKey="product.key"
