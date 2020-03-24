@@ -1,5 +1,6 @@
 <template>
     <v-container >
+      {{cart.items}}
     <v-row >
       <v-col cols="7">
         <v-row 
@@ -161,13 +162,12 @@
             <v-list-item-title>ยอดรวม</v-list-item-title>
             <v-list-item-title class="text-right" > <strong> {{cartTotal.amount}} ฿</strong></v-list-item-title>
         </v-list-item>
-        {{cart.total}}
-        {{cart.address}}
+       
        
         <v-divider></v-divider>
 
         <v-card-actions>
-            <v-btn  width="100%" color="green" @click="confirm(cartTotal)" >ยืนยันการสั่งซื้อ</v-btn>
+            <v-btn  width="100%" color="green" @click="confirm(cartTotal)"  :disabled="!valid" >ยืนยันการสั่งซื้อ</v-btn>
            
         </v-card-actions>
 
@@ -199,6 +199,7 @@ export default {
  
   methods: {
     confirm(cartTotal){
+
        this.$store.commit('catalog/updateTotal', cartTotal)
        this.$store.commit('catalog/updateAddress', this.userData)
        this.$store.dispatch('catalog/postOrder', this.cart)
@@ -206,7 +207,7 @@ export default {
     },
     jobsDone(){
       this.removeErrors()
-      this.$router.replace("/")
+      this.$router.replace("/order")
     }
     
   },

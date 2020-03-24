@@ -107,7 +107,7 @@ export const actions = {
       })
   },
   postOrder ({dispatch, commit}, payload) {
-    // orders/orderKey/userKey/productKey/productDetail
+   
     const orderKey = fireApp.database().ref('orders').push().key
     const items = payload.items
     const address = payload.address
@@ -116,24 +116,27 @@ export const actions = {
     let orderItems = {}
     console.log(payload)
     items.forEach(item => {
-      orderItems[`orders/${orderKey}/${user.uid}/${item.product.idKey}`] = {
+      orderItems[`orders/${orderKey}/items/${item.product.idKey}`] = {
         productID: item.product.productID,
         product: item.product.name,
         price: item.product.price,
         quantity: item.quantity,
         imageUrl: item.product.imageUrl,
-        createdAt: new Date().toISOString()
+       
+        createdAt: new Date().toISOString(),
       }
       fireApp.database().ref().update(orderItems)
     })
     let order = {}
-        order[orderKey] = {
-                            date:new Date().toISOString(),
-                            status:"wait",
-                            address:address,
-                            total:total
-                          }
-    fireApp.database().ref(`userOrders/${user.uid}`).update(order)
+        order= {
+                  userID: user.uid,
+                  status:"wait",
+                  address:address,
+                  total:total,
+                  date: new Date().toISOString(),
+                }
+    fireApp.database().ref(`orders/${orderKey}/detail/`).update(order)
+    fireApp.database().ref(`userOrders/${user.uid}/${orderKey}`).update(order)
     
       
    

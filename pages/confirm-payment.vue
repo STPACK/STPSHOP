@@ -18,9 +18,8 @@
                             md="12"
                         >
                             <v-text-field
-                                v-model="userData.orderId"
-                                :rules="rules.nameRules"
-                                :counter="15"
+                                readonly
+                                :value="ret()"
                                 label="เลขที่ใบสั่งซื้อ"
                                 required
                             ></v-text-field>
@@ -91,12 +90,22 @@
                             cols="12"
                             md="6"
                         >
-                             <input type="file" @change="onImageSelect">
+                             <input type="file" @change="onImageSelect" 
+						ref="image"
+						accept="image/*">
+                              
                         </v-col>
                         </v-row>
-                        <v-btn small  @click="test()"  class="mr-2">
-                                ดูรายละเอียด  
+                        
+                        <v-btn   @click="confirm()"   :disabled="!valid" class="mr-2" color="green">
+                                ยืนยันการโอนเงิน  
                         </v-btn>
+                       
+                        <v-overlay :value="overlay">
+                        <v-progress-circular indeterminate size="64"></v-progress-circular>
+                        </v-overlay>
+                     
+                      
                         </v-container>
 		  </v-form>
         </v-card>
@@ -111,10 +120,9 @@ export default {
     data () {
     return {
         
-        menu2: false,
-        menu: false,
+        overlay: false,
         valid: true,
-       
+        
         userData:{
             orderId:'',
             name:'',
@@ -122,40 +130,56 @@ export default {
             email:'',
             phone:'',
             total:'',
-            
             image: null,
-            imageName: '',
-            imageUrl:''
-
-            
+            imageName: '',  
         }
     }
   },
  
   methods: {
+      tyu(){
+          this.userData.orderId = this.ret()
+      },
+     
+      ret(){
+          const data = this.orderData.payload
+          return data
+      },
+      
     onImageSelect (event) {
+        var d = new Date();
+        var n = d.getTime();
         const files = event.target.files
-        this.userData.imageName = files[0].name
+        this.userData.imageName = n+files[0].name
         this.userData.image = files[0]
+        console.log("change")
         
        
         
       },
-      test () {
-        
-          
+      confirm () {
+             this.userData.orderId = this.ret()
+             this.overlay=!this.overlay
+            setTimeout(() => {
+          this.overlay = false
+             }, 3000)
            
-              this.$store.dispatch('order/test', this.userData)
+              this.$store.dispatch('order/confirmPayment', this.userData)
            
           
         
       },
     jobsDone(){
       this.removeErrors()
-      this.$router.replace("/")
+      this.$router.replace("/order")
     }
     
   },
+  computed:{
+       orderData(){
+        return this.$store.getters['order/orderInfo']
+      },
+  }
 
 }
 </script>

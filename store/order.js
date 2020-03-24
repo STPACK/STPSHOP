@@ -3,7 +3,8 @@ import { fireApp } from '@/plugins/firebase'
 export const state = () => ({
   order: [],
   userOrder:[],
-  orderInfo:{}
+  orderInfo:{},
+  
   
     
     
@@ -20,14 +21,10 @@ export const mutations = {
   loadOrderInfo (state, payload) {
     state.orderInfo = payload
   },
-  
-  
+ 
   updateCart (state, payload) {
     state.cart.items.push(payload)
   },
- 
-
-
 }
 
 export const actions = {
@@ -49,9 +46,13 @@ export const actions = {
           })
       },
 
-    getUserOrder({commit},payload) {
+    getUserOrder({commit},payloads) {
         const user = fireApp.auth().currentUser
-        fireApp.database().ref(`orders/${payload}/${user.uid}`).once('value')
+        const payload = payloads.key
+        const status = payloads.status
+
+        
+        fireApp.database().ref(status+'/'+payload+'/'+'items').once('value')
           .then(snapShot => {
             const products = []
             let item = {}
@@ -77,82 +78,69 @@ export const actions = {
           })
       },
 
-      test ({dispatch, commit}, payload) {
+      confirmPayment ({dispatch, commit}, payload) {
         const productData = payload
         
         const image = payload.image
-        
+        const user = fireApp.auth().currentUser
+        const orderKey = payload.productKey
         let productKey = ''
         
         delete productData.image
     
         commit('setBusy', true, { root: true })
         commit('clearError', null, { root: true })
-
+        console.log(productData)
         fireApp.database().ref('payment').push(productData)      
           .then(result => {
             productKey = result.key
             console.log(productKey)
-            return fireApp.storage().ref(`payment/${image.name}`).put(image)
+            return fireApp.storage().ref(`payment/${productData.imageName}`).put(image)
           })
-          .then(fileData => {
-            const imageUrl = fileData.ref.getDownloadURL()
-            console.log(imageUrl)
-            console.log(productKey)
-            return fireApp.database().ref('payment/' + productKey).set({
-              imageUrl: imageUrl,
-            
-            });
-           
+          .then(snapshot => {
+            snapshot.ref.getDownloadURL().then((url)=>{
+              const postData ={
+                imageUrl:url,
+                productKey:productKey
+              }
+              var updates = {};
+            updates['/payment/' + productKey] = postData;
+              
+
+              console.log(postData)
+              fireApp.database().ref('payment').child(productKey).update(postData)
+            }).then(()=>{
+              fireApp.database().ref('orders/'+productData.orderId).once('value')
+              .then(function(snapshot) {
+                  const detail = snapshot.child("detail").val()
+                  const items = snapshot.child("items").val()
+                  const data ={
+                    detail:detail,
+                    items:items
+                  }
+                  fireApp.database().ref('ordersed/'+productData.orderId).update(data) 
+              }).then(()=>{
+              return fireApp.database().ref('orders/'+productData.orderId).remove()
+              })
+
+               fireApp.database().ref(`ordersed/${productData.orderId}/detail`).update({status:'confirm'})
+               fireApp.database().ref(`userOrders/${user.uid}/${productData.orderId}`).update({status:'confirm'})
+
+            }).then(()=>{
+              dispatch('getOrder')
+              commit('setBusy', false, { root: true })
+              commit('setJobDone', true, { root: true })
+            })
+            .catch(error => {
+              commit('setBusy', false, { root: true })
+              commit('setError', error, { root: true })
+            })
+         
           })
-          
-          
-          
+         
       },
 
-      
-  
  
-  postOrder ({commit}, payload) {
-    // orders/orderKey/userKey/productKey/productDetail
-    const orderKey = fireApp.database().ref('orders').push().key
-    const items = payload.items
-    const address = payload.address
-    const total = payload.total
-    const user = fireApp.auth().currentUser
-    let orderItems = {}
-    console.log(payload)
-    items.forEach(item => {
-      orderItems[`orders/${orderKey}/${user.uid}/${item.product.idKey}`] = {
-        productID: item.product.productID,
-        product: item.product.name,
-        price: item.product.price,
-        quantity: item.quantity,
-        imageUrl: item.product.imageUrl,
-        createdAt: new Date().toISOString()
-      }
-      fireApp.database().ref().update(orderItems)
-    })
-    let order = {}
-        order[orderKey] = {
-                            date:new Date().toISOString(),
-                            status:"wait",
-                            address:address,
-                            total:total
-                          }
-    fireApp.database().ref(`userOrders/${user.uid}`).update(order)
-    
-      
-   
-      .then(() => {
-        commit('emptyCart')
-        commit('setJobDone', true, { root: true })
-        
-      })
-      .catch(error => {
-        commit('setError', error, { root: true })
-      })
-  }
 }
 
 export const getters = {
@@ -165,5 +153,6 @@ export const getters = {
     orderInfo (state) {
         return state.orderInfo
     },
+    
     
 }

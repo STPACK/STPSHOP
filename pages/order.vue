@@ -4,7 +4,7 @@
 
   <v-data-table
     :headers="headers"
-    :items="desserts"
+    :items="orderList"
     sort-by="calories"
     class="elevation-1"
   >
@@ -16,18 +16,19 @@
         <v-toolbar-title>My Order</v-toolbar-title>
         
         <v-spacer></v-spacer>
-         <v-btn  color="green" @click="test" >test</v-btn>
+        
 
        
       </v-toolbar>
     </template>
+
     <template v-slot:item.action="{ item }">
       
      
-      <v-btn small  @click="view(item.key)"  class="mr-2">
-            ดูรายละเอียด  
+      <v-btn small  @click="view(item.key,item.status)"  class="mr-2">
+            ดูรายละเอียด 
        </v-btn>
-      <v-btn small :hidden="item.status === 'wait' ? false :true" @click="confirmPayment(item.key)">
+      <v-btn small :hidden="item.status === 'wait' ? false :true" @click="confirmPayment(item.key,item.status)">
             แจ้งโอนเงิน  
        </v-btn>
       
@@ -66,15 +67,13 @@ import mainAPI from '@/mixins/mainAPI'
     }},
 
     computed: {
-      desserts(){
+      orderList(){
         return this.$store.getters['order/order']
-      }
+      },
+     
      
     },
     
-
-    
-
     created () {
       const loadedOrder = this.$store.getters['order/order']
       if (loadedOrder.length === 0) {
@@ -88,37 +87,44 @@ import mainAPI from '@/mixins/mainAPI'
        this.$store.dispatch('order/getOrder')
       },
 
-      confirmPayment (key) {
+      confirmPayment (key,payload) {
+        var status=''
+        if (payload === "wait"){
+          status = 'orders'
+        }else{ status ="ordersed"}
        
-       this.$store.dispatch('order/getUserOrder',key)
-       setTimeout(() => (this.$router.push('/confirm-payment')), 500)
+       this.$store.dispatch('order/getUserOrder',{key:key,status:status})
+       setTimeout(() => (this.$router.push('/confirm-payment')), 2000)
         
-
       },
 
-      
-      view(key){
-        this.$store.dispatch('order/getUserOrder',key)
-        setTimeout(() => (this.$router.push('/orders/'+key)), 500)
+      view(key,payload){
+        var status=''
+        if (payload === "wait"){
+          status = 'orders'
+        }else{ status ="ordersed"}
+
+        
+        this.$store.dispatch('order/getUserOrder',{key:key,status:status})
+        setTimeout(() => (this.$router.push('/orders/'+key)), 1000)
          
-            
-          
-          
       },
 
       
       getColor (status) {
-        if (status === "wait") return 'warning'
-        else if (status === "confirm") return 'light-green'
-        else if (status === "Transport") return 'green'
-        else if (status === "complete") return 'light-blue'
+        if (status === "wait") return 'purple lighten-2'
+        else if (status === "confirm") return 'warning'
+        else if (status === "complete") return 'light-blue darken-1'
+        else if (status === "packing") return 'light-green'
+        else if (status === "done") return 'green'
         else if (status === "error")return 'red'
       },
       getStatus (status) {
-        if (status === "wait") return "รอแจ้งการโอนเงิน"
-        else if (status === "confirm") return 'ยืนยันการโอนเงิน'
-        else if (status === "Transport") return 'กำลังจัดส่ง'
-        else if (status === "complete") return 'จัดส่งเสร็จสิ้น'
+        if (status === "wait") return "รอแจ้งการชำระเงิน"
+        else if (status === "confirm") return 'ได้รับการแจ้งชำระเงิน รอตรวจสอบ'
+        else if (status === "complete") return 'ชำระเงินเรียบร้อย'
+        else if (status === "packing") return 'เตรียมการจัดส่ง'
+        else if (status === "done") return 'จัดส่องเรียบร้อย'
         else  if (status === "error")return 'กรุณาติดต่อเจ้าหน้าที่'
         
       },

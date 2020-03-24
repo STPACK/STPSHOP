@@ -3,7 +3,7 @@
     <v-row >
       <v-col cols="7">
         <v-row 
-          v-for="(item,index) in loadedOrder" :key="index" 
+          v-for="(item,items) in orderList.items" :key="items" 
         >
           <v-card
             class=" mb-2 d-inline-block"
@@ -18,7 +18,7 @@
                         </v-col>
                         <v-col cols="5">
                             
-                                {{item.product}}
+                                {{ item.product }}
                             
                         </v-col>
 
@@ -28,14 +28,14 @@
                                 
                             >
                                 <v-col >
-                                {{item.price}}฿
+                                ฿{{item.price}}
                                 </v-col>
 
                             </v-row>
                         </v-col>
                         <v-col>
                              
-                            {{item.quantity}}
+                    {{ item.quantity }}
                     
                         </v-col>
                     </v-row>
@@ -44,23 +44,22 @@
             </v-card>
               
           </v-row>
+          
+
          
+          
         
       </v-col>
       <v-col cols="5">
-        <v-card
-        class="pa-2"
-          outlined
-          tile
-        >
+        <v-card>
+            <v-img :src="paymentList.imageUrl" max-height="200" max-width="200" contain></v-img>
            <v-card-title>
-             ที่อยู่จัดส่ง
+            รูปแนบ
             </v-card-title>
             <v-card-subtitle>
-            {{loadedOrderInfi.address.name}}  {{loadedOrderInfi.address.lastName}} <br>
-            {{loadedOrderInfi.address.phone}}  <br>
-            {{loadedOrderInfi.address.address}}
-              
+            {{paymentList.name}}  {{paymentList.lastName}} <br>
+            {{paymentList.email}}  {{paymentList.phone}} <br>
+            {{paymentList.address}} 
             </v-card-subtitle>
           
         </v-card>
@@ -73,69 +72,76 @@
         >
            <v-list-item-content>
         <v-list-item-title class="headline">สรุปรายการสั่งซื้อ</v-list-item-title>
+           
+            
         
       </v-list-item-content>
         <v-list-item>
             <v-list-item-title>ยอดสินค้าจำนวน</v-list-item-title>
-            <v-list-item-title class="text-right"> {{loadedOrderInfi.total.quantity}}ชิ้น</v-list-item-title>
+            <v-list-item-title class="text-right">{{orderList.detail.total.quantity}} ชิ้น</v-list-item-title>
         </v-list-item>
         <v-list-item>
             <v-list-item-title>ยอดรวม</v-list-item-title>
-            <v-list-item-title class="text-right" > <strong> {{loadedOrderInfi.total.amount}}  ฿</strong></v-list-item-title>
+            <v-list-item-title class="text-right" > <strong> {{orderList.detail.total.amount}}฿</strong></v-list-item-title>
         </v-list-item>
-      
-      
-        
+       
+       
         <v-divider></v-divider>
-    
+
         <v-card-actions>
-            <v-btn  width="100%" color="green" to="/order" >Back to Order</v-btn>
+            <v-btn  width="100%" color="green"  @click="confirm" >ยืนยันการโอนเงิน</v-btn>
            
         </v-card-actions>
 
         </v-card>
       </v-col>
     </v-row>
+  
   </v-container>
 </template>
 
 
 <script>
-import mainAPI from '@/mixins/mainAPI'
-import cart from '@/mixins/cart'
+
+
 export default {
-     mixins:[mainAPI,cart],
+     
     data () {
     return {
         
-       
+        
         
     }
-    },
-   
+  },
+ 
   methods: {
-     
-       
     
-     
-    jobsDone(){
-      this.removeErrors()
-      this.$router.replace("/")
-    },
-  
+        confirm(){
+            const payload = {
+              userID: this.orderList.detail.userID,
+              payment: this.paymentList.productKey,
+              orderID: this.paymentList.orderId,
+                         
+            }
+            confirm('Are you sure ?') &&
+            this.$store.dispatch('orderAdmin/confirmPayment',payload)
+            setTimeout(() => (this.$router.push('/admin/order')), 2000)
+        }
+   
     
   },
    computed: {
-      loadedOrder(){
-        return this.$store.getters['order/userOrder']
+      paymentList(){
+        return this.$store.getters['orderAdmin/confirmPayment']
       },
-      loadedOrderInfi(){
-        return this.$store.getters['order/orderInfo']
+      orderList(){
+        return this.$store.getters['orderAdmin/confirmOrder']
       },
-       
+      
      
      
     },
+   
 
 }
 </script>
