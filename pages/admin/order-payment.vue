@@ -12,12 +12,9 @@
         
         <v-spacer></v-spacer>
         <v-btn small  @click="backToOrder()"  class="mr-2">
-            Order 
+             Back to Order 
        </v-btn>
-        <v-btn small    class="mr-2">
-            Orderแจ้งการโอนเงิน 
-       </v-btn>
-
+        
        
       </v-toolbar>
       

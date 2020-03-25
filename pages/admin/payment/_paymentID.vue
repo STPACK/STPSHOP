@@ -89,7 +89,8 @@
         <v-divider></v-divider>
 
         <v-card-actions>
-            <v-btn  width="100%" color="green"  @click="confirm" >ยืนยันการโอนเงิน</v-btn>
+            <v-btn  width="50%" color="green"  @click="confirm" >ยืนยันการโอนเงิน</v-btn>
+            <v-btn  width="50%" color="red"  to="/admin/order-payment" >ยกเลิก</v-btn>
            
         </v-card-actions>
 
@@ -125,7 +126,8 @@ export default {
             }
             confirm('Are you sure ?') &&
             this.$store.dispatch('orderAdmin/confirmPayment',payload)
-            setTimeout(() => (this.$router.push('/admin/order')), 2000)
+            setTimeout(() => (this.$router.push('/admin/order-payment')), 2000)
+            this.$store.dispatch('orderAdmin/getPayment')
         }
    
     

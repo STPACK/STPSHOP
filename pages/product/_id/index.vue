@@ -76,7 +76,7 @@
                     <input  style="width:50px;" type="number" ref="quantity" value="1">
                     <v-btn class="ma-2" tile color="green" dark  @click="addToCart(product, $refs.quantity.value)">
                         
-                        <v-icon left> mdi-shopping-outline</v-icon> BUY NOW
+                        <v-icon left> mdi-shopping-outline</v-icon> add to cart
                         
                         </v-btn>
 

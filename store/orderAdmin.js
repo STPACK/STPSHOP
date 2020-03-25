@@ -5,6 +5,7 @@ export const state = () => ({
   payment:[],
   confirmPayment:[],
   confirmOrder:[],
+  actionOrder:[]
  
  
   
@@ -27,10 +28,11 @@ export const mutations = {
   loadConfirmOrder(state, payload) {
     state.confirmOrder = payload
   },
- 
-  updateCart (state, payload) {
-    state.cart.items.push(payload)
+  loadActionOrder(state, payload) {
+    state.actionOrder = payload
   },
+ 
+ 
 }
 
 export const actions = {
@@ -53,10 +55,21 @@ export const actions = {
                 
           })
       },
-
-    getPayment ({commit}) {
+    getActionOrder ({commit},payload) {
       
-        
+      const order = payload
+      fireApp.database().ref('ordersed/'+order).once('value')
+      .then(function(snapshot) {
+          var detail = snapshot.child("detail").val()
+          var items = snapshot.child("items").val()
+          
+             commit('loadActionOrder', {detail,items})
+           
+      })
+      },
+
+      getPayment ({commit}) {
+      
         fireApp.database().ref('payment/').once('value')
           .then(snapShot => {
             const products = []
@@ -78,8 +91,6 @@ export const actions = {
       
         const payment = payload.payment
         const order = payload.order
-       
-
         fireApp.database().ref('/payment/' + payment).once('value').then(function(snapshot) {
             var products = snapshot.val() 
           
@@ -117,20 +128,19 @@ export const actions = {
             dispatch('getOrderAdmin')
          })
 
-
-        
-
-
-
-
       },
 
-     changeStatus({commit},payload){
+     changeStatus({commit,dispatch},payload){
+          const status = payload.status
+          const userID = payload.userID
+          const orderID = payload.orderID
 
-        fireApp.database().ref(`orders/${productData.orderId}/detail`).update({status:'confirm'})
+        fireApp.database().ref(`ordersed/${orderID}/detail`).update({status:status})
         .then(()=>{
-           return fireApp.database().ref(`userOrders/${user.uid}/${productData.orderId}`).update({status:'confirm'})
+           return fireApp.database().ref(`userOrders/${userID}/${orderID}`).update({status:status})
             
+        }).then(()=>{
+          dispatch('getOrderAdmin')
         })
       }
 
@@ -160,6 +170,9 @@ export const getters = {
     },
     confirmOrder (state) {
         return state.confirmOrder
+    },
+    actionOrder (state) {
+        return state.actionOrder
     },
     
     

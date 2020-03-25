@@ -121,13 +121,19 @@ export const actions = {
                   fireApp.database().ref('ordersed/'+productData.orderId).update(data) 
               }).then(()=>{
               return fireApp.database().ref('orders/'+productData.orderId).remove()
-              })
+              }).then(()=>{
 
-               fireApp.database().ref(`ordersed/${productData.orderId}/detail`).update({status:'confirm'})
-               fireApp.database().ref(`userOrders/${user.uid}/${productData.orderId}`).update({status:'confirm'})
+                return fireApp.database().ref(`ordersed/${productData.orderId}/detail`).update({status:'confirm'})
+              }).then(()=>{
+
+                return fireApp.database().ref(`userOrders/${user.uid}/${productData.orderId}`).update({status:'confirm'})
+              }).then(()=>{
+                dispatch('getOrder')
+                
+              })
+                
 
             }).then(()=>{
-              dispatch('getOrder')
               commit('setBusy', false, { root: true })
               commit('setJobDone', true, { root: true })
             })

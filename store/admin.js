@@ -52,24 +52,7 @@ export const actions = {
         commit('setError', error, { root: true })
       })
   },
-  getAdmins ({commit}) {
-    fireApp.database().ref('group').orderByChild('name').equalTo('admin').once('value')
-      .then(snapShot => {
-        let item = {}
-        const groupKey = Object.keys(snapShot.val())[0]
-        fireApp.database().ref(`userGroups/${groupKey}`).on('child_added', 
-          snapShot => {
-            item = {
-              id: snapShot.key,
-              name: snapShot.val()
-            }
-            commit('loadAdmins', item)
-          })
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  },
+  
   
 }
 

@@ -73,10 +73,10 @@
             <v-flex d-flex>
               <v-card width="100%"  flat tile>
                   
-                    <input type="number" value="1" >
-                    <v-btn class="ma-2" tile color="green" dark>
+                   
+                    <v-btn class="ma-2" tile color="green" dark to="/admin/product">
                         
-                        <v-icon left> mdi-shopping-outline</v-icon> BUY NOW
+                        <v-icon left> mdi-shopping-outline</v-icon> Back To Product
                         
                         </v-btn>
 

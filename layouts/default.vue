@@ -143,7 +143,7 @@
           </v-menu>
           
         </div>
-         <menubar/>
+        
       
       
       
@@ -153,7 +153,7 @@
 
       <v-toolbar-items>
         
-         <v-btn text>{{this.$store.getters.user}}</v-btn>
+       
        
       </v-toolbar-items>
      
@@ -229,11 +229,11 @@ export default {
       }
         
     },
-    created () {
-    if (!this.userLoggedIn) {
-      this.$store.dispatch('setAuthStatus')
-    }    
-    },
+    // created () {
+    // if (!this.userLoggedIn) {
+    //   this.$store.dispatch('setAuthStatus')
+    // }    
+    // },
     
     computed:{
       userProfile () {

@@ -34,7 +34,9 @@ export const mutations = {
     state.cart.address=[]
   },
   updateQuantity (state, payload) {
-    state.cart.items[payload.index].quantity = payload.productQuantity
+    state.cart.items[payload.index].quantity = 
+    state.cart.items[payload.index].quantity+
+    payload.productQuantity
   },
   increaseQuantity (state, payload) {
     state.cart.items[payload].quantity++
@@ -52,6 +54,7 @@ export const mutations = {
 }
 
 export const actions = {
+  
   getProducts ({commit}) {
     fireApp.database().ref('products').limitToLast(50).once('value')
       .then(snapShot => {
@@ -69,43 +72,7 @@ export const actions = {
       })
   },
   
-  productSearch ({commit}, payload) {
-    let ref = 'products'
-    if (payload.category) {
-      ref = `productCategories/${payload.category}`
-    }
-
-    fireApp.database().ref(`${ref}`).orderByChild('name').limitToLast(50).startAt(payload.keyword).endAt(payload.keyword + '\uf8ff').once('value')
-      .then(snapShot => {
-        let products = []
-        let item = {}
-
-        snapShot.forEach(child => {
-          item = child.val()
-          item.key = child.key
-          products.push(item)
-        })
-
-        if (payload.sort) {
-          if (payload.sort === 'low') {
-            products.sort(function (a, b) {
-              return a.price - b.price
-            })
-          } else {
-            products.sort(function (a, b) {
-              return b.price - a.price
-            })
-          }
-        } else {
-          products = products.reverse()
-        }
-
-        commit('loadProducts', products)
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  },
+  
   postOrder ({dispatch, commit}, payload) {
    
     const orderKey = fireApp.database().ref('orders').push().key

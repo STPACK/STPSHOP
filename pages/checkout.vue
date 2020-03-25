@@ -1,6 +1,6 @@
 <template>
     <v-container >
-      {{cart.items}}
+     
     <v-row >
       <v-col cols="7">
         <v-row 

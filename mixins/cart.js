@@ -31,6 +31,7 @@ export default {
             this.$store.commit('catalog/increaseQuantity', index)
            
           } else {
+           
             this.$store.commit('catalog/updateQuantity', { index, productQuantity })
            
           }

@@ -95,7 +95,7 @@ export const actions ={
               email: DataUser.email,
               name: DataUser.displayName
             }
-            console.log(authUser)
+           
             return fireApp.database().ref('group').orderByChild('name').equalTo('admin').once('value')
               .then(snapShot => {
                 const groupKey = Object.keys(snapShot.val())[0]
@@ -106,7 +106,7 @@ export const actions ={
                     } else {
                       authUser.role = 'customer'
                     }
-                    console.log(authUser)
+                   
                     commit('setUser', authUser)
                     
                     commit('setBusy', false)
@@ -120,35 +120,13 @@ export const actions ={
           })
       },
 
+
       logOut ({commit}) {
         fireApp.auth().signOut()
         commit('setUser', null)
       },
 
-      setAuthStatus ({commit}) {
-        fireApp.auth().onAuthStateChanged((user) => {
-          if (user) {
-            const authUser = {
-              id: user.uid,
-              email: user.email,
-              name: user.displayName
-            }
-            fireApp.database().ref('group').orderByChild('name').equalTo('admin').once('value')
-              .then(snapShot => {
-                const groupKey = Object.keys(snapShot.val())[0]
-                fireApp.database().ref(`userGroups/${groupKey}`).child(`${authUser.id}`).once('value')
-                  .then(uGroupSnap => {
-                    if (uGroupSnap.exists()) {
-                      authUser.role = 'admin'
-                    } else {
-                      authUser.role = 'customer'
-                    }
-                    commit('setUser', authUser)
-                  })
-              })
-          }
-        })
-      },
+    
 
       updateProfile ({commit, getters}, payload) {
       
@@ -183,6 +161,21 @@ export const actions ={
             commit('setError', error)
           })        
       },
+
+      changePwd ({commit}, payload) {
+        commit('setBusy', true)
+        commit('clearError')
+        const user = fireApp.auth().currentUser
+        user.updatePassword(payload)
+          .then(() => {
+            commit('setBusy', false)
+            commit('setJobDone', true)
+          })
+          .catch(error => {
+            commit('setBusy', false)
+            commit('setError', error)
+          })
+      }
 
     
       

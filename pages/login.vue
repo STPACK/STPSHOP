@@ -2,9 +2,7 @@
     <div>
         <v-container fluid>
             
-                <v-btn to="/admin" color="amber">
-                    ADMIN
-                </v-btn>
+                
                 <v-form
                     ref="form"
                     v-model="valid"

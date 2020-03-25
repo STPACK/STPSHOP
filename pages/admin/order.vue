@@ -15,7 +15,7 @@
         
         <v-spacer></v-spacer>
         <v-btn small  @click="test()"  class="mr-2">
-            ดูรายละเอียด 
+            Order Action 
        </v-btn>
         <v-btn small  @click="orderPayment()"  class="mr-2">
             Orderแจ้งการโอนเงิน 
@@ -26,6 +26,12 @@
 
       
     </template>
+    <template v-slot:item.action="{ item }">
+      
+      
+      <v-btn small color="primary"   @click="action(item.key)"  :hidden="item.detail.status === 'confirm'  ? true : false" >Action</v-btn>
+        </template>
+       
     
     
     
@@ -79,20 +85,20 @@ import mainAPI from '@/mixins/mainAPI'
       test () {
        this.$store.dispatch('orderAdmin/getOrderAdmin')
       },
+      action (key) {
+        
+        this.$store.dispatch('orderAdmin/getActionOrder',key)
+       setTimeout(() => (this.$router.push('/admin/orders/'+key)), 2000)
+      },
 
-      orderPayment (key) {
+      orderPayment () {
        
-       this.$store.dispatch('orderAdmin/getPayment',key)
+       this.$store.dispatch('orderAdmin/getPayment')
        setTimeout(() => (this.$router.push('/admin/order-payment')), 2000)
         
       },
 
-      view(key){
-
-        this.$store.dispatch('order/getUserOrder',key)
-        setTimeout(() => (this.$router.push('/orders/'+key)), 1000)
-           
-      },
+     
 
       
       getColor (status) {
@@ -105,7 +111,7 @@ import mainAPI from '@/mixins/mainAPI'
       },
       getStatus (status) {
         if (status === "wait") return "รอแจ้งการชำระเงิน"
-        else if (status === "confirm") return 'ได้รับการแจ้งชำระเงิน รอตรวจสอบ'
+        else if (status === "confirm") return 'รอตรวจสอบการแจ้งชำระเงิน'
         else if (status === "complete") return 'ชำระเงินเรียบร้อย'
         else if (status === "packing") return 'เตรียมการจัดส่ง'
         else if (status === "done") return 'จัดส่องเรียบร้อย'

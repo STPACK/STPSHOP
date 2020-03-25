@@ -75,10 +75,9 @@ import mainAPI from '@/mixins/mainAPI'
     },
     
     created () {
-      const loadedOrder = this.$store.getters['order/order']
-      if (loadedOrder.length === 0) {
+    
         this.$store.dispatch('order/getOrder')
-      }
+      
     },
     
     methods: {
@@ -121,7 +120,7 @@ import mainAPI from '@/mixins/mainAPI'
       },
       getStatus (status) {
         if (status === "wait") return "รอแจ้งการชำระเงิน"
-        else if (status === "confirm") return 'ได้รับการแจ้งชำระเงิน รอตรวจสอบ'
+        else if (status === "confirm") return 'รอตรวจสอบการแจ้งชำระเงิน'
         else if (status === "complete") return 'ชำระเงินเรียบร้อย'
         else if (status === "packing") return 'เตรียมการจัดส่ง'
         else if (status === "done") return 'จัดส่องเรียบร้อย'
