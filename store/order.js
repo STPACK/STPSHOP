@@ -5,10 +5,6 @@ export const state = () => ({
   userOrder:[],
   orderInfo:{},
   
-  
-    
-    
-  
 })
 
 export const mutations = {
@@ -21,7 +17,6 @@ export const mutations = {
   loadOrderInfo (state, payload) {
     state.orderInfo = payload
   },
- 
   updateCart (state, payload) {
     state.cart.items.push(payload)
   },
@@ -51,12 +46,10 @@ export const actions = {
         const payload = payloads.key
         const status = payloads.status
 
-        
         fireApp.database().ref(status+'/'+payload+'/'+'items').once('value')
           .then(snapShot => {
             const products = []
             let item = {}
-            
             snapShot.forEach(child => {
               item = child.val()
               item.key = child.key
@@ -94,7 +87,7 @@ export const actions = {
         fireApp.database().ref('payment').push(productData)      
           .then(result => {
             productKey = result.key
-            console.log(productKey)
+           
             return fireApp.storage().ref(`payment/${productData.imageName}`).put(image)
           })
           .then(snapshot => {
@@ -106,8 +99,6 @@ export const actions = {
               var updates = {};
             updates['/payment/' + productKey] = postData;
               
-
-              console.log(postData)
               fireApp.database().ref('payment').child(productKey).update(postData)
             }).then(()=>{
               fireApp.database().ref('orders/'+productData.orderId).once('value')

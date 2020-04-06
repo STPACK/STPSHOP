@@ -19,20 +19,13 @@ export const mutations = {
     const i = state.products.indexOf(payload)
     state.products.splice(i, 1)
   },
-  loadProductCategories (state, payload) {
-    state.productCategories.push(payload)
-  },
-  clearProductCategories (state) {
-    state.productCategories = []
-  }
+ 
 }
 
 export const actions = {
   
   addProduct ({dispatch, commit}, payload) {
     const productData = payload
-    
-    
     commit('setBusy', true, { root: true })
     commit('clearError', null, { root: true })
     fireApp.database().ref('products').push(productData)      
@@ -46,6 +39,8 @@ export const actions = {
         commit('setError', error, { root: true })
       })
   },
+
+
   getProducts ({commit}) {
     fireApp.database().ref('products').once('value')
       .then(snapShot => {
@@ -59,15 +54,14 @@ export const actions = {
         commit('loadProducts', products.reverse())
       })
   },
+
+
   updateProduct ({dispatch, commit}, payload) {
-    
-           
-    
     commit('setBusy', true, { root: true })
     commit('clearError', null, { root: true })
     fireApp.database().ref(`products/${payload.key}`).update(payload)  // Update products data with updated product detail 
       .then(() => {    
-        dispatch('getProducts') // Dispatch getProducts to refresh the products list
+        dispatch('getProducts') 
         commit('setBusy', false, { root: true })
         commit('setJobDone', true, { root: true })
       })
@@ -76,12 +70,10 @@ export const actions = {
         commit('setError', error, { root: true })
       })
   },
+
+
   removeProduct ({commit}, payload) {
-  
-    
       fireApp.database().ref(`products/${payload.key}`).remove()
-         
-      
       .then(() => {
         commit('removeProduct', payload)
       })
@@ -90,18 +82,7 @@ export const actions = {
       })
   },
   
-  productCategories ({commit}, payload) {
-    commit('clearProductCategories')
-    fireApp.database().ref('productCategories').on('child_added',
-      snapShot => {
-        let item = snapShot.val()
-        item.key = snapShot.key
-        if (item[payload] !== undefined) {          
-          commit('loadProductCategories', item.key)
-        }
-      }
-    )
-  }
+  
 }
 
 export const getters = {
@@ -112,7 +93,5 @@ export const getters = {
   product (state) {
     return state.product
   },
-  productCategories (state) {
-    return state.productCategories
-  }
+  
 }
