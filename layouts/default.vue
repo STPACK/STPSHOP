@@ -278,8 +278,6 @@ export default {
 .contrainer{
   width: 80%;
   margin: 0 auto;
-  
-  
 }
 
 .searchBar{
